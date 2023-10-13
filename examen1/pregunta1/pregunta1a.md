@@ -1,8 +1,6 @@
 # Pregunta 1a)
 ## Jorge Correia - 14-12054
 
-# FALTA LA 1 Y LA DE POLIMORFISMO EN LA 3
-
 Para responder esta pregunta se usó el lenguaje de programación Java. Su elección además de seguir con el enunciado de la pregunta, es un lenguaje de programación con trayectoria y estabilidad.
 
 - De una breve descripción del lenguaje escogido.
