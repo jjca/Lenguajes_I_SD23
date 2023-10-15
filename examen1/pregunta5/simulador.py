@@ -24,6 +24,9 @@ class Interpreter:
     def getBaseLanguage(self):
         return self.base_language
     
+    def getDestLanguage(self):
+        return self.language
+    
 class Translator:
     def __init__(self,base_language,origin_language,dest_language):
         self.base_language = base_language
@@ -61,11 +64,35 @@ class Maquina():
         else:   
             print("chao")
             return 1
-    
+
+    def twoInterpreterAddition(self,interpreter_a,interpreter_b):
+        if (interpreter_a.getBaseLanguage != interpreter_b.getBaseLanguage and interpreter_a.getDestLanguage != interpreter_b.getDestLanguage):
+            if (interpreter_a.getDestLanguage() == interpreter_b.getBaseLanguage()):
+                self.addInterpreterToMachine(interpreter_a.getBaseLanguage(),interpreter_b.getDestLanguage())
+            else:
+                print("Interpreter language not supported")
+        else:
+            print("Same interpreter. Not adding")
+
+    def interpreterLoop(self,new_interpreter):
+        for machine_interpreter in self.interpreters:
+            print(f"El interprete nuevo es desde {new_interpreter.getBaseLanguage()} a {new_interpreter.getDestLanguage()}")
+            print(f"el interprete en maquina es {machine_interpreter.getBaseLanguage()} a {machine_interpreter.getDestLanguage()}")
+            if machine_interpreter.getDestLanguage() == new_interpreter.getBaseLanguage():
+                print("bueno, el nuevo tiene un lenguaje base soportado por un destino ")
+                self.twoInterpreterAddition(machine_interpreter,new_interpreter)
+            else:
+                print("idk")
+
     def addProgram(self,program_name,program_language):
         self.programs.append(Program(program_name,program_language))
         return True
 
+    def addLanguageToProgram(self,program_name,program_language):
+        for prog in self.programs:
+            if prog.getName() == program_name:
+                prog.addLanguage(program_language)
+    
     def searchInterpreter(self,base_language,dest_language):
         for Interp in self.interpreters:
             if Interp.base_language == base_language and Interp.language == dest_language:
@@ -73,11 +100,18 @@ class Maquina():
                 return True
         else:
             print("Interprete no existe")
+          
+            self.interpreterLoop(self.addInterpreterToMachine(base_language,dest_language))
             return False
             
-    def addInterpreter(self,base_language,dest_language):
-        self.interpreters.append(Interpreter(base_language,dest_language))
-        return True
+    def addInterpreterToMachine(self,base_language,dest_language):
+        new_interpreter = Interpreter(base_language,dest_language)
+        if base_language in self.languages:
+            self.languages.append(dest_language)
+            
+        self.interpreters.append(new_interpreter)
+
+        return new_interpreter
             
     def searchTranslator(self,base_language,origin_language,dest_language):
         for trans in self.translators:
@@ -113,10 +147,7 @@ def main():
 
             elif 'interprete' == entrada[1].lower():
                 if (not LOCAL.searchInterpreter(entrada[2].lower(),entrada[3].lower())):
-                    if(LOCAL.addInterpreter(entrada[2].lower(),entrada[3].lower())):
-                        print(f"Se definió un intérprete para '{entrada[3]}', escrito en '{entrada[2]}'")
-                    else:
-                        print("error desconocido - interprete")
+                    print(f"Se definió un intérprete para '{entrada[3]}', escrito en '{entrada[2]}'")
                 else:
                     print(f"No se definió un intérprete para '{entrada[3]}', escrito en '{entrada[2]}'")
 
@@ -144,6 +175,10 @@ def main():
             print("#############")
             for program in LOCAL.programs:
                 print(f"Programa: {program.getName()} lenguajes: {program.getLanguages()}")
+            print("#############")
+        elif 'lang' == entrada[0].lower():
+            print("#############")
+            print(LOCAL.languages)
             print("#############")
         else:
             print("Error de sintaxis vuelva a escribir")
