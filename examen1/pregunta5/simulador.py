@@ -89,8 +89,6 @@ class Maquina():
                 interpreter_pop = old_list.pop(0)
                 print(f"El interprete que se sacó tiene: {interpreter_pop.getBaseLanguage()}->{interpreter_pop.getDestLanguage()}")
                 print(f"el interprete que se va a evaluar tiene {new_interpreter.base_language} -> {new_interpreter.getDestLanguage()}")
-                print(f" aloooo{base_language} -> {dest_language}")
-                
                 # Si el lenguaje base del desempilado es igual al lenguaje de destino del nuevo  entonces
                 # desempilado = (L0->L1)
                 # nuevo = (L2 -> L0)
@@ -138,8 +136,56 @@ class Maquina():
                     break      
                     print("idk") """
 
+    def translatorLoop(self,base_language,origin_language,dest_language):
+        """
+        base_language: lenguaje en el que esta escrito
+        origin_language: lenguaje desde el cual se traudce
+        dest_language: lenguaje al que se traduce
+        (origin_language -> destlanguage)(base_language)
+        """
+        old_list = self.translators.copy()
+        if (not self.searchTranslator(base_language,origin_language,dest_language)):
+            print(f"Vamos a definir el traductor desde {origin_language} -> {dest_language} escrito en {base_language}")
+            new_translator = self.addTranslator(base_language,origin_language,dest_language)[1]
+            if new_translator.base_language in self.supported_languages and new_translator.dest_language in self.supported_languages:
+                # Si el lenguaje en el que esta escrito el traductor lo entiende la maquina 
+                # Y 
+                # el lenguaje de origen lo entiende la maquina
+                # Entonces el lenguaje de destino lo entiende la maquina 
+                # (T1 -> T2)(T0) /\ T0 and T1 in supported_lang => T2 in supported_lang
+                self.addLanguageToMachine(new_translator.origin_language)
+            while old_list:
+                translator_pop = old_list.pop(0)
+                print(f"El traductor que se sacó tiene: {translator_pop.origin_language}->{translator_pop.dest_language} escrito en {translator_pop.base_language}")
+                print(f"el traductor que se va a evaluar tiene {new_translator.origin_language} -> {new_translator.dest_language} escrito en {new_translator.base_language}")
 
+                if (translator_pop.origin_language == new_translator.base_language):
+                    print("Printer if")
+                    # Nuevo: (T0 -> T1)(T2)
+                    # POP: (T2 -> T3)(T4)
+                    # Crea: (T0 -> T1)(T4)
+                    # Si el Lenguaje que recibe el traductor_pop pertenece a los soportados por la maquina (T2 in supported)
+                    # Y 
+                    # El lenguaje en el que esta escrito el traductor_pop (T4 in supported) 
+                    # ENTONCES
+                    # Se debe crear el traductor desde el lenguaje de origen (T0) del nuevo traductor hacia el de destino del nuevo (T1), escrito en el de destino del traductor_pop (T3)
 
+                    self.translatorLoop(translator_pop.dest_language,new_translator.origin_language,new_translator.dest_language)
+                    return True
+                elif (new_translator.origin_language == translator_pop.base_language and new_translator.base_language in self.supported_languages):
+                    print("segundo if")
+                    # Nuevo: (T0 -> T1)(T2)
+                    # POP: (T2 -> T3)(T4)
+                    # Crea: (T0 -> T1)(T3)
+                    # Si el Lenguaje de origen del traductor nuevo (T0) es igual al lenguaje en el que esta escrito el traductor pop (T4)
+                    # ENTONCES
+                    # Se debe crear el traductor desde el lenguaje de origen (T0) del nuevo traductor hacia el de destino del nuevo (T1), escrito en el de destino del traductor_pop (T3)
+                    self.translatorLoop(new_translator.dest_language,translator_pop.origin_language,translator_pop.dest_language)
+                    return True
+                
+        else:
+            return False               
+                
     def addProgram(self,program_name,program_language):
         self.programs.append(Program(program_name,program_language))
         return True
@@ -172,9 +218,21 @@ class Maquina():
             return False
     
     def addTranslator(self,base_language,origin_language,dest_language):
-        self.translators.append(Translator(base_language,origin_language,dest_language))
-        return True
-
+        """
+        base_language: lenguaje en el que esta escrito
+        origin_language: lenguaje desde el cual se traudce
+        dest_language: lenguaje al que se traduce
+        """
+        translator = Translator(base_language,origin_language,dest_language)
+        self.translators.append(translator)
+        return True,translator
+    
+    def addLanguageToMachine(self,language):
+        if language not in self.supported_languages:
+            self.supported_languages.append(language)
+            return True
+        return False
+    
     def checkIfExecutable(self,program_name):
         if len(self.programs) == 0:
             print("Lista vacia")
@@ -220,11 +278,8 @@ def main():
                     print(f"No se definió un intérprete para '{entrada[3]}', escrito en '{entrada[2]}'")
 
             elif 'traductor' == entrada[1].lower():
-                if (not LOCAL.searchTranslator(entrada[2].lower(),entrada[3].lower(),entrada[4].lower())):
-                    if(LOCAL.addTranslator(entrada[2].lower(),entrada[3].lower(),entrada[4].lower())):
-                        print(f"Se definió un traductor de '{entrada[3]}' hacia '{entrada[4]}', escrito en '{entrada[2]}'")
-                    else:
-                        print("error desconocido - traductor")
+                if (LOCAL.translatorLoop(entrada[2].lower(),entrada[3].lower(),entrada[4].lower())):
+                    print(f"Se definió un traductor de '{entrada[3]}' hacia '{entrada[4]}', escrito en '{entrada[2]}'")
                 else:
                     print(f"El traductor de '{entrada[3]}' hacia '{entrada[4]}', escrito en '{entrada[2]}' ya existe")
         elif 'ejecutable' == entrada[0].lower():
