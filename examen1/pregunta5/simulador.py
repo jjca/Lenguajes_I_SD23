@@ -65,15 +65,6 @@ class Maquina():
             print("El programa no existe")
             return 1
 
-    """def twoInterpreterAddition(self,interpreter_a,interpreter_b):
-        if (interpreter_a.getBaseLanguage != interpreter_b.getBaseLanguage and interpreter_a.getDestLanguage != interpreter_b.getDestLanguage):
-            if (interpreter_a.getDestLanguage() == interpreter_b.getBaseLanguage()):
-                self.addInterpreterToMachine(interpreter_a.getBaseLanguage(),interpreter_b.getDestLanguage())
-            else:
-                print("Interpreter language not supported")
-        else:
-            print("Same interpreter. Not adding") """
-
     def interpreterLoop(self,base_language,dest_language):
         old_list = self.interpreters.copy()
         
@@ -84,6 +75,7 @@ class Maquina():
             """ El interprete se añade a maquina y si su lenguaje base es igual a uno soportado por la maquina entonces 
             el lenguaje de destino es soportado por la maquina """
             self.addInterpreterToMachine(new_interpreter)
+            
             while old_list:
                 # Se desempila un interprete de la lista vieja (la que no tiene al nuevo)
                 interpreter_pop = old_list.pop(0)
@@ -99,6 +91,7 @@ class Maquina():
                 if (interpreter_pop.getBaseLanguage() == dest_language and base_language in self.supported_languages):
                     print("primer if")
                     self.interpreterLoop(base_language,interpreter_pop.getDestLanguage())
+                    self.newInterpreterWithTranslators(base_language,dest_language)
                     return True
         
                 #Si el lenguaje de destino del desempilado es igual al lenguaje base del nuevo 
@@ -110,32 +103,25 @@ class Maquina():
                 elif (interpreter_pop.getDestLanguage() == base_language and interpreter_pop.getBaseLanguage() in self.supported_languages):
                     print("segundo if")
                     self.interpreterLoop(interpreter_pop.getBaseLanguage(),dest_language)
+                    self.newInterpreterWithTranslators(base_language,dest_language)
                     return True              
             return True
         else:
             return False
 
+    def newInterpreterWithTranslators(self,base_language,dest_language):
+        for trans in self.translators:
+            if trans.base_language in self.supported_languages and trans.origin_language == base_language:
+                print(f"Se vera si se crea el interprte desde {trans.dest_language} hacia {dest_language}")
+                self.interpreterLoop(trans.dest_language,dest_language)
 
-    """    size_list_old = list_sizes
-        while interpreters_stack_old:
-            
-            interpreters_stack.pop(0)
-            print(f"El interprete nuevo es desde {new_interpreter.getBaseLanguage()} a {new_interpreter.getDestLanguage()}")
-            print(f"el interprete en maquina es {machine_interpreter.getBaseLanguage()} a {machine_interpreter.getDestLanguage()}")
-            if machine_interpreter.getDestLanguage() == new_interpreter.getBaseLanguage():
-                print("bueno, el nuevo tiene un lenguaje base soportado por un destino ")
-                if (self.searchInterpreter(machine_interpreter.getBaseLanguage(),new_interpreter.getDestLanguage())):
-                    self.interpreterLoop(new_interpreter)
-                elif (machine_interpreter.getBaseLanguage != new_interpreter.getBaseLanguage and machine_interpreter.getDestLanguage != new_interpreter.getDestLanguage):
-                    self.searchInterpreter(machine_interpreter.getBaseLanguage(),new_interpreter.getDestLanguage())
-                #self.twoInterpreterAddition(machine_interpreter,new_interpreter)
-                else:
-                    break
-            else:
-                if (self.searchInterpreter(new_interpreter.getBaseLanguage(),new_interpreter.getDestLanguage())):
-                    break      
-                    print("idk") """
 
+    def newInterpreterWithTranslator(self,translator: Translator):
+        for interp in self.interpreters:
+            if interp.getBaseLanguage() == translator.origin_language and translator.base_language in self.supported_languages:
+                print(f"Se vera si se crea el interprte desde {translator.dest_language} hacia {interp.getDestLanguage()}")
+                self.interpreterLoop(translator.dest_language,interp.getDestLanguage())
+        
     def translatorLoop(self,base_language,origin_language,dest_language):
         """
         base_language: lenguaje en el que esta escrito
@@ -147,6 +133,7 @@ class Maquina():
         if (not self.searchTranslator(base_language,origin_language,dest_language)):
             print(f"Vamos a definir el traductor desde {origin_language} -> {dest_language} escrito en {base_language}")
             new_translator = self.addTranslator(base_language,origin_language,dest_language)[1]
+            
             if new_translator.base_language in self.supported_languages and new_translator.dest_language in self.supported_languages:
                 # Si el lenguaje en el que esta escrito el traductor lo entiende la maquina 
                 # Y 
@@ -171,6 +158,7 @@ class Maquina():
                     # Se debe crear el traductor desde el lenguaje de origen (T0) del nuevo traductor hacia el de destino del nuevo (T1), escrito en el de destino del traductor_pop (T3)
 
                     self.translatorLoop(translator_pop.dest_language,new_translator.origin_language,new_translator.dest_language)
+                    self.newInterpreterWithTranslator(new_translator)
                     return True
                 elif (new_translator.origin_language == translator_pop.base_language and new_translator.base_language in self.supported_languages):
                     print("segundo if")
@@ -181,6 +169,7 @@ class Maquina():
                     # ENTONCES
                     # Se debe crear el traductor desde el lenguaje de origen (T0) del nuevo traductor hacia el de destino del nuevo (T1), escrito en el de destino del traductor_pop (T3)
                     self.translatorLoop(new_translator.dest_language,translator_pop.origin_language,translator_pop.dest_language)
+                    self.newInterpreterWithTranslator(new_translator)
                     return True
                 
         else:
