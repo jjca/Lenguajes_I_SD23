@@ -1,5 +1,4 @@
 import sys
-import re
 
 class Program:
     def __init__(self,name,language):
