@@ -21,6 +21,7 @@ class Memory:
             program = Program(program_name,quantity)
             self.programs.append(program)
         else:
+            print("No se guardo??")
             return False
 
     def searchProgram(self,program_name):
@@ -35,45 +36,57 @@ class Memory:
 
     def searchFreeMemory(self,node,program,quantity):
         level = math.ceil(math.log2(quantity))
-        print(f"buscando memoria en el nodo {node}")
+        print(f"buscando memoria en el nodo {node.id}")
         print(f"nivel requerido: {level}")
         print(f"nivel actual: {node.level}")
-        if node.level >= level and node.reserved == False:
-            if node.level == level and node.reserved == False:
-                print(" por aquiii")
+        if node.level >= level and node.program == None:
+            if node.level == level and not node.reserved:
+                print("Reservada la memoria")
                 node.addProgram(program)
-            elif node.bendicion_i != None and node.bendicion_i.reserved == False:
-                self.searchFreeMemory(node.bendicion_i,program,quantity)
                 return True
-            elif node.bendicion_d != None and node.bendicion_d.reserved == False:
-                self.searchFreeMemory(node.bendicion_d,program,quantity)
-                return True
-            elif node.bendicion_i == None:
-                print("Holis va a dar a luz")
+            elif node.level != level and node.bendicion_i != None and node.bendicion_i.program == None and node.bendicion_i.reserved == False:
+                print("El hijo izquierdo no está reservado, vamos pa esa")
+                return self.searchFreeMemory(node.bendicion_i,program,quantity)
+            elif node.bendicion_d != None and (node.bendicion_d.program == None or node.bendicion_d.reserved == False):
+                print("El hijo derecho no está reservado, vamos pa esa")
+                return self.searchFreeMemory(node.bendicion_d,program,quantity)
+            elif node.bendicion_i == None and node.level > 0:
+                print("No tiene hijos")
                 bendicion_i, bendicion_d = node.giveBirth(len(self.nodes))
                 self.addNode(bendicion_i)
                 self.addNode(bendicion_d)
-                self.searchFreeMemory(bendicion_i,program,quantity)
-                return True
+                return self.searchFreeMemory(bendicion_i,program,quantity)
             else:
+                print("No se que hace este caso")
+                return self.searchFreeMemory(node.bendicion_i,program,quantity)
                 print("fljfd")
 
-        elif node.level >= level and node.reserved == True and node.program != None:
-            print("no hay espaciop")
-        elif node.level >= level and node.reserved == True:
-            if node.bendicion_i != None and not node.bendicion_i.reserved and node.level == level+1:
-                node.bendicion_i.addProgram(program)
-                return True
-            elif node.bendicion_d != None and not node.bendicion_d.reserved and node.level == level+1:
-                node.bendicion_d.addProgram(program)
-                return True
-            elif node.bendicion_d != None and node.bendicion_d.reserved == False and node.bendicion_d.program == None:
-                self.searchFreeMemory(node.bendicion_d,program,quantity)
+        elif node.level >= level and node.reserved and node.program != None:
+            if node.level == level and node.bendicion_i != None and node.bendicion_i.reservado:
+                print("Voy al hermano derecho")
+                return self.searchFreeMemory(node.pure.bendicion_d,program,quantity)
+            elif node.level == level and node.bendicion_d != None and node.bendicion_d.reservado:
+                print("Voy al tio")
+                return self.searchFreeMemory(node.pure.pure.bendicion_d,program,quantity)
+            
+        elif node.level >= level and node.reserved:
+            if node.bendicion_i != None and node.bendicion_i.program == None and node.bendicion_d.program == None and node.level == level:
+                print("slfsao")
+                node.addProgram(program)
+            elif node.bendicion_d != None and node.bendicion_d.program == None and node.bendicion_d.reserved == False and node.level == level:
+                print("es asi")
+                node.addProgram(program)
+            elif node.bendicion_d != None and node.bendicion_d.program == None:
+                print("que")
+                return self.searchFreeMemory(node.bendicion_d,program,quantity)
                 #print("Probablemente no hay memoria disponible")
+            else:
+                print("por aqui")
                 return False
                 
         else:
             print("owos")
+            return False
 
         """ while (node.level != level):
             # Si estamos en el nodo padre, verificamos que tenga hijos, y si nos tiene se le crean
@@ -137,10 +150,12 @@ class Node:
 
     def addProgram(self,program):
         self.program = program
+        pure = self.pure
+        while pure != None:
+            pure.reserved = True
+            pure = pure.pure          
         if self.pure == None:
             pass
-        else:
-            self.pure.reserved = True
         self.reserved = True
 
     def reserveNode(self):
@@ -172,7 +187,7 @@ def main():
         except ValueError:
             print("El valor no es un número")
             continue
-        if memory_size > 0 and memory_size < 1024000 :
+        if 0 < memory_size < 1024000 :
             log = math.log2(memory_size)
             if math.ceil(log) == math.floor(log):
                 print("Potencia de dos")
