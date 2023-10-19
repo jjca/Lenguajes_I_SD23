@@ -125,7 +125,8 @@ namespace espacioDeVectores {
 
 using namespace espacioDeVectores;
 int main(void) {
-    std::cout << "hello world";
+    // Se muestran vectores aleatorios con las operaciones correspondientes
+    std::cout << "hola!";
     Vector a(rand()%10,rand()%10,rand()%10);
     Vector b(rand()%10,rand()%10,rand()%10);
     Vector c(rand()%10,rand()%10,rand()%10);
@@ -135,11 +136,11 @@ int main(void) {
     b.print();
     c.print();
     res = a+b;
-    cout << "a+b";
+    cout << "Suma de vectores a+b";
     res.print();
 
-    res = b+a;
-    cout << "b+a";
+    res = b+c;
+    cout << "Suma de vectores b+c";
     res.print();
     
     res = a*b+c;
@@ -147,8 +148,16 @@ int main(void) {
     res.print();
     
     res = (b+b)*(c-a);
-    cout << "(b+b)*(c-a)";
+    cout << "Producto cruz y suma y resta de vectores (b+b)*(c-a)";
     res.print();
+
+    res2 = a % (c*b);
+    cout << "a % (c*b)" << res2 << endl;
+
+    res = b+3;
+    cout << "Suma vector con escalar: b+3";
+    res.print();
+
 
     res = a+3;
     cout << "a+3";
@@ -157,12 +166,9 @@ int main(void) {
     res = 3+a;
     cout << "3+a";
     res.print();
-    //res = a % (c*b);
+    
     res = a * 3.0 + &b;
-    cout << "a*3.0+&b";
-    res.print();
-    res = a * 3.0 + &b;
-    cout << "3.0*a+&b";
+    cout << "Producto de vector y escalar con suma con escalar a*3.0+&b";
     res.print();
 
     res = (b+b);
@@ -186,7 +192,6 @@ int main(void) {
     res = (c%a)*(b+b);
     cout << " (c%a)*(b+b);";
     res.print();
-
     
     return 0;
 };
