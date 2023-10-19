@@ -1,5 +1,8 @@
 import sys
 
+""" 
+Clase programa que incluye los lenguajes que soporta y su nombre
+"""
 class Program:
     def __init__(self,name,language):
         self.name = name
@@ -14,7 +17,9 @@ class Program:
     def getName(self):
         return self.name
     
-
+"""
+Clase interprete con el lenguaje de origen y el de destino
+"""
 class Interpreter:
     def __init__(self,base_language,language):
         self.base_language = base_language
@@ -26,16 +31,34 @@ class Interpreter:
     def getDestLanguage(self):
         return self.language
     
+"""
+Clase traductor
+base_language = Lenguaje en el que está escrito
+origin_language = Lenguaje de origen
+dest_languuage = lenguaje de destino
+"""
 class Translator:
     def __init__(self,base_language,origin_language,dest_language):
         self.base_language = base_language
         self.origin_language = origin_language
         self.dest_language = dest_language
     
+
+"""
+Nombre del lenguaje
+"""
 class Language:
     def __init__(self,name):
         self.name = name
 
+"""
+Clase de la maquina
+supported_languages: lista de lenguajes soportados
+executable_programs: lenguajes que se ejecutan
+translators: traductores añadidos
+programs: programas añadidos, no necesariamente ejecutables
+interpreters: interpretes añadidos
+"""
 class Maquina():
     def __init__(self):
         self.supported_languages = ['local']
@@ -44,33 +67,36 @@ class Maquina():
         self.programs = []
         self.interpreters = []
 
-
+    """
+    Busca si existe el programa
+    """
     def searchProgram(self,program_name,program_language):
         print(program_name)
         print(program_language)
         if len(self.programs) == 0:
-            print("No hay programas definidos")
             return 0
         for prog in self.programs:
             if prog.getName() == program_name:
                 if (program_language in prog.getLanguages()):
                     return 2
                 else:
-                    print("programe existe pero sin ese lenguaje")
-                    print("adding lang")
+                    print("El programa existe pero sin ese lenguaje")
                     prog.addLanguage(program_language)
                     return -1
         else:   
             print("El programa no existe")
             return 1
 
+    """
+    Loop que se ejecuta para crear nuevos interpretes y saber que lengaujes pueden interpretarse
+    """
     def interpreterLoop(self,base_language,dest_language):
         old_list = self.interpreters.copy()
         
         new_interpreter = Interpreter(base_language,dest_language)
         # Si no existe el interprete lo añadimos
         if (not self.searchInterpreter(new_interpreter)):
-            print(f"El interprete que entró ahorita se creará con {base_language} -> {dest_language}")
+            #print(f"El interprete que entró ahorita se creará con {base_language} -> {dest_language}")
             """ El interprete se añade a maquina y si su lenguaje base es igual a uno soportado por la maquina entonces 
             el lenguaje de destino es soportado por la maquina """
             self.addInterpreterToMachine(new_interpreter)
@@ -78,8 +104,8 @@ class Maquina():
             while old_list:
                 # Se desempila un interprete de la lista vieja (la que no tiene al nuevo)
                 interpreter_pop = old_list.pop(0)
-                print(f"El interprete que se sacó tiene: {interpreter_pop.getBaseLanguage()}->{interpreter_pop.getDestLanguage()}")
-                print(f"el interprete que se va a evaluar tiene {new_interpreter.base_language} -> {new_interpreter.getDestLanguage()}")
+            #    print(f"El interprete que se sacó tiene: {interpreter_pop.getBaseLanguage()}->{interpreter_pop.getDestLanguage()}")
+            #    print(f"el interprete que se va a evaluar tiene {new_interpreter.base_language} -> {new_interpreter.getDestLanguage()}")
                 # Si el lenguaje base del desempilado es igual al lenguaje de destino del nuevo  entonces
                 # desempilado = (L0->L1)
                 # nuevo = (L2 -> L0)
@@ -88,7 +114,6 @@ class Maquina():
                 # entonces se llama para ver si hay que crear un interprete (L2 -> L1)
                 
                 if (interpreter_pop.getBaseLanguage() == dest_language and base_language in self.supported_languages):
-                    print("primer if")
                     self.interpreterLoop(base_language,interpreter_pop.getDestLanguage())
                     self.newInterpreterWithTranslators(base_language,dest_language)
                     return True
@@ -100,7 +125,6 @@ class Maquina():
                 #  el lenguaje base del desempilado pertenece a la lista de soportados
                 #entonces se llama para ver si hay que crear un interprete (L0 -> L2)
                 elif (interpreter_pop.getDestLanguage() == base_language and interpreter_pop.getBaseLanguage() in self.supported_languages):
-                    print("segundo if")
                     self.interpreterLoop(interpreter_pop.getBaseLanguage(),dest_language)
                     self.newInterpreterWithTranslators(base_language,dest_language)
                     return True              
@@ -108,19 +132,25 @@ class Maquina():
         else:
             return False
 
+    """
+    Loop para generar interpretes a partir de nuevos traductores
+    """
     def newInterpreterWithTranslators(self,base_language,dest_language):
         for trans in self.translators:
             if trans.base_language in self.supported_languages and trans.origin_language == base_language:
-                print(f"Se vera si se crea el interprte desde {trans.dest_language} hacia {dest_language}")
                 self.interpreterLoop(trans.dest_language,dest_language)
 
-
+    """
+    Loop para ejecutar por cada interprete definido
+    """
     def newInterpreterWithTranslator(self,translator: Translator):
         for interp in self.interpreters:
             if interp.getBaseLanguage() == translator.origin_language and translator.base_language in self.supported_languages:
-                print(f"Se vera si se crea el interprte desde {translator.dest_language} hacia {interp.getDestLanguage()}")
                 self.interpreterLoop(translator.dest_language,interp.getDestLanguage())
-        
+    
+    """
+    Loop usado para generar traductores, ejecutado a definir un traductor
+    """
     def translatorLoop(self,base_language,origin_language,dest_language):
         """
         base_language: lenguaje en el que esta escrito
@@ -142,11 +172,8 @@ class Maquina():
                 self.addLanguageToMachine(new_translator.origin_language)
             while old_list:
                 translator_pop = old_list.pop(0)
-                print(f"El traductor que se sacó tiene: {translator_pop.origin_language}->{translator_pop.dest_language} escrito en {translator_pop.base_language}")
-                print(f"el traductor que se va a evaluar tiene {new_translator.origin_language} -> {new_translator.dest_language} escrito en {new_translator.base_language}")
 
                 if (translator_pop.origin_language == new_translator.base_language):
-                    print("Printer if")
                     # Nuevo: (T0 -> T1)(T2)
                     # POP: (T2 -> T3)(T4)
                     # Crea: (T0 -> T1)(T4)
@@ -160,7 +187,6 @@ class Maquina():
                     self.newInterpreterWithTranslator(new_translator)
                     return True
                 elif (new_translator.origin_language == translator_pop.base_language and new_translator.base_language in self.supported_languages):
-                    print("segundo if")
                     # Nuevo: (T0 -> T1)(T2)
                     # POP: (T2 -> T3)(T4)
                     # Crea: (T0 -> T1)(T3)
@@ -173,16 +199,24 @@ class Maquina():
                 
         else:
             return False               
-                
+
+    """
+    Añade un programa a la maquina
+    """     
     def addProgram(self,program_name,program_language):
         self.programs.append(Program(program_name,program_language))
         return True
-
+    """
+    Añade un lenguaje a un programa
+    """
     def addLanguageToProgram(self,program_name,program_language):
         for prog in self.programs:
             if prog.getName() == program_name:
                 prog.addLanguage(program_language)
     
+    """
+    Busca si existe un interprete
+    """
     def searchInterpreter(self,interpreter):
         for Interp in self.interpreters:
             if Interp.base_language == interpreter.getBaseLanguage() and Interp.language == interpreter.getDestLanguage():
@@ -190,7 +224,10 @@ class Maquina():
                 return True
         else:
             return False
-            
+        
+    """
+    Añade un interprete a la maquina
+    """
     def addInterpreterToMachine(self,new_interpreter):
         if new_interpreter.getBaseLanguage() in self.supported_languages and new_interpreter.getDestLanguage() not in self.supported_languages:
             self.supported_languages.append(new_interpreter.getDestLanguage())
@@ -205,6 +242,7 @@ class Maquina():
             print("Traductor no existe")
             return False
     
+    # Añade un traductor
     def addTranslator(self,base_language,origin_language,dest_language):
         """
         base_language: lenguaje en el que esta escrito
@@ -215,15 +253,16 @@ class Maquina():
         self.translators.append(translator)
         return True,translator
     
+    # Añade un lenguaje a la maquina
     def addLanguageToMachine(self,language):
         if language not in self.supported_languages:
             self.supported_languages.append(language)
             return True
         return False
     
+    # Verifica si un programa es ejecutable
     def checkIfExecutable(self,program_name):
         if len(self.programs) == 0:
-            print("Lista vacia")
             return False
         for program in self.programs:
             if program_name == program.name:
@@ -237,7 +276,6 @@ class Maquina():
                 print(self.supported_languages)
                 return False
             else: 
-                print("coño?")
                 print(f"{program_name}, {program.name}")
         return False
         
