@@ -5,6 +5,20 @@ class memoryNoAvailable(Exception):
     "La capacidad es menor a la requerida"
     pass
 
+class inputError(Exception):
+    "Error de entrada"
+    pass
+class programDoesNotExists(Exception):
+    "No existe el programa"
+    pass
+
+class programDoesExists(Exception):
+    "No existe el programa"
+    pass
+
+"""
+Clase memoria para manejo de los objetos y listas
+"""
 class Memory:
     def __init__(self,memory_size,root):
         self.total_size = int(memory_size)
@@ -13,21 +27,19 @@ class Memory:
         self.programs = []
         self.nodes = []
     
-    def addProgram(self,program_name,quantity):
+    def addProgram(self,program_name,original_name,quantity):
         if self.free_memory < quantity:
             raise memoryNoAvailable
         
-        if self.searchFreeMemory(self.root,program_name,quantity):
+        if self.searchFreeMemory(self.root,program_name,original_name,quantity):
             program = Program(program_name,quantity)
             self.programs.append(program)
         else:
-            print("No se guardo??")
             return False
 
     def searchProgram(self,program_name):
         for prog in self.programs:
             if prog.name == program_name:
-                print("program exists")
                 return True
         return False
     
@@ -39,15 +51,12 @@ class Memory:
     Un nodo "reservado" no siempre tiene un programa, es que al menos uno de 
     sus hijos tiene un programa almacenado y está reservado.
     """
-    def searchFreeMemory(self,node,program,quantity):
+    def searchFreeMemory(self,node,program,original_name,quantity):
         # El nivel viene determinado por el logaritmo 2 de la cantidad de memoria a ser
         # reservada. 
         level = math.ceil(math.log2(quantity))
         # Variable para mantener lo retornado
         return_value = False
-        print(f"buscando memoria en el nodo {node.id}")
-        print(f"nivel requerido: {level}")
-        print(f"nivel actual: {node.level}")
         if node.level != level:
             # Si el nodo no está reservado
             if not node.reserved and node.program == None:
@@ -59,11 +68,11 @@ class Memory:
                     self.addNode(bendicion_d)
 
                 # Recorremos el arbol por la izquierda
-                return_value = self.searchFreeMemory(node.bendicion_i,program,quantity)
+                return_value = self.searchFreeMemory(node.bendicion_i,program,original_name,quantity)
 
                 # Si nos dicen que no hay espacio en el lado izquierdo, a por el derecho
                 if not return_value:
-                    return_value = self.searchFreeMemory(node.bendicion_d,program,quantity)
+                    return_value = self.searchFreeMemory(node.bendicion_d,program,original_name,quantity)
 
                 return return_value
             
@@ -73,10 +82,9 @@ class Memory:
         else: 
             # Estoy en el nivel que es y veo que no tenga hijos, ya que
             # si tiene entonces no puedo reservar
-            print(f"node: {node.id}")
             if node.bendicion_i == None and node.program == None and not node.reserved:
-                node.addProgram(program)
-                print("Reservado")
+                node.addProgram(program,original_name,quantity)
+                self.free_memory = self.free_memory - 2**level
                 return True
             
             else:
@@ -87,17 +95,17 @@ class Memory:
     Quitamos las bendiciones (hijos) de los nodos al liberar memoria
     """
     def quitarBendiciones(self,node):
-        del node.bendicion_i
-        del node.bendicion_d
+
+        pure_id = node.id
+        # Eliminamos los nodos de la lista
         node.bendicion_i = None
         node.bendicion_d = None
-
-        # Eliminamos los nodos de la lista
-
-        for node_bendicion in self.nodes:
-            if node_bendicion.pure_id == node.id:
-                self.nodes.remove(node_bendicion)
-
+        newlist = []
+        for nodes in self.nodes:
+            if nodes.pure_id != pure_id:
+                newlist.append(nodes)
+        self.nodes = newlist
+        
 
     """
     Función para liberación de memoria. Esto se hace recorriendo el arbol
@@ -116,7 +124,6 @@ class Memory:
 
                 if return_val_i and return_val_d:
                     self.quitarBendiciones(node)
-                    print("Se eliminaron los hijos")
                     return True
                 
                 return False
@@ -126,12 +133,17 @@ class Memory:
             if node.program == program:
                 node.program = None
                 node.reserved = False
+                node.memory = 0
                 for prog in self.programs:
                     if prog.name == program:
                         self.programs.remove(prog)
                 return True
             else:
                 return False
+
+"""
+Clase nodo que define los parámetros y métodos de los nodos
+"""
 class Node:
     def __init__(self,pure,start,end,id,level):
         self.pure = pure
@@ -145,24 +157,32 @@ class Node:
         self.end = end
         self.id = id
         self.program = None
+        self.program_original_name = None
         self.level = level
         self.reserved = False
-
-    def addProgram(self,program):
+        self.memory = 0
+    """
+    Agrega el programa al objeto nodo y lo marca como reservado
+    """
+    def addProgram(self,program,original_name,memory):
+        self.memory = memory
         self.program = program
+        self.program_original_name = original_name
         if self.pure == None:
             pass
         self.reserved = True
 
-    def reserveNode(self):
-        self.pure.reserved = True
-        self.reserved = True
-
+    """
+    Crea (da a luz) a los hijos del nodo pure (padre)
+    """
     def giveBirth(self,curr_id):
         self.bendicion_i = Node(self,math.ceil(self.start/2),math.floor((self.end/2)),curr_id,self.level-1)
         self.bendicion_d = Node(self,self.bendicion_i.end+1,self.end,self.bendicion_i.id+1,self.level-1)
         return self.bendicion_i,self.bendicion_d
 
+    """
+    Representación del árbol de memoria
+    """
     def __str__(self):
         return f'\n### papa: {self.pure_id}, id: {self.id} rango {self.start},{self.end}, nivel {self.level}, programa: {self.program} reservado {self.reserved} \n \t hijo izq {self.bendicion_i}, \t hijo der: {self.bendicion_d}' 
 
@@ -175,55 +195,91 @@ class Program:
         return f"programa: {self.name}, memoria: {self.memory}"
 
 def main():
-    print("Hola")
     correct = 0
     while not correct:
         try:
-            memory_size = int(input("Introduzca la cantidad de bloques. Use potencias de dos y numeros positivos\n"))
+            memory_size = int(input("Introduzca la cantidad de bloques. Use potencias de dos y números positivos\n"))
+            if 0 < memory_size < 1024000:
+                log = math.log2(memory_size)
+                if math.ceil(log) == math.floor(log):
+                    correct = 1
+                else:
+                    print("ERROR: Por favor introduzca una potencia de 2")
+            else:
+                print("ERROR: Por favor introduzca un número positivo")
+
         except ValueError:
             print("El valor no es un número")
             continue
-        if 0 < memory_size < 1024000:
-            log = math.log2(memory_size)
-            if math.ceil(log) == math.floor(log):
-                print("Potencia de dos")
-                correct = 1
-            else:
-                print("ERROR: Por favor introduzca una potencia de 2")
-        else:
-            print("ERROR: Por favor introduzca un número positivo")
     root = Node(None,0,memory_size-1,0,int(math.log2(memory_size)))
     memory = Memory(memory_size,root)
     memory.addNode(root)
-    #print(root)
-    for line in sys.stdin:
-        print("De algo")
-        entrada = line.rstrip().split(" ")
-        if 'salir' == line.rstrip().lower():
+    activo = True
+    while activo:
+        entrada = list(input("Introduzca una opción válida. Para más información escriba HELP:  ").split())
+        if 'salir' == entrada[0].lower() and len(entrada) == 1:
+            activo = False
             break
         elif 'reservar' == entrada[0].lower() and len(entrada) == 3:
             try:
                 quantity = int(entrada[1])
                 try: 
                     if quantity > memory.total_size:
-                        print("Memoria no disponible")
-                except:
-                    raise memoryNoAvailable
-                if (not memory.searchProgram(entrada[2].lower())):
-                    memory.addProgram(entrada[2].lower(),quantity)
-                else:
-                    print("programa existe")
+                        raise memoryNoAvailable
+                    if len(entrada[2].lower()) == 0 or len(entrada) < 3:
+                        print("Nombre del programa vacio")
+                        raise inputError
+                    if (not memory.searchProgram(entrada[2].lower())):
+                        memory.addProgram(entrada[2].lower(),entrada[2],quantity)
+                        print (f"Memoria reservada para el programa {entrada[2]}")
+                    else:
+                        raise programDoesExists
+                except memoryNoAvailable:
+                    print("Memoria no disponible para reservar")
+                    continue
+                except inputError:
+                    print("Por favor introduzca los datos correctamente")
+                    continue
+                except programDoesExists:
+                    print("El programa ya existe No puede reservarse memoria")
                     continue
             except ValueError:
                 print("La cantidad no es numero, intente nuevamente")
                 continue
-        elif 'tree' == entrada[0]:
-            print(root)
-        elif 'prog' == entrada[0]:
+        elif 'liberar' == entrada[0].lower() and len(entrada) == 2:
+            try:
+                if (memory.searchProgram(entrada[1].lower())):
+                    memory.freeMemory(memory.root,entrada[1].lower())
+                    print(f"Memoria del programa {entrada[1]} liberada")
+                else:
+                    raise programDoesNotExists
+            except programDoesNotExists:
+                print("El programa indicado no existe. No se puede liberar memoria no reservada")
+                continue
+        elif 'mostrar' == entrada[0].lower():
+            print("Memoria en uso:")
+    
+            for node in memory.nodes:
+                if node.memory > 0:
+                    print(f"\t Programa: {node.program_original_name} - Memoria en uso: {node.memory} - Bloque en uso: {2**node.level}")
+            print("Memoria libre")
+            free = []
+            for node in memory.nodes:
+                if (node.memory == 0 and node.bendicion_i == None):
+                    free.append(2**node.level)
+            print(f"\t Hay libres: {free} bloques", end =" \n")
+    
+        elif 'prog' == entrada[0].lower() and len(entrada) == 1:
             for prog in memory.programs:
                 print(f"#### {prog}")
-
-    #Memoria = Memory()
+        elif 'help' == entrada[0].lower() and len(entrada) == 1:
+            print("\n Los siguientes comandos están disponibles:")
+            print("RESERVAR <cantidad> <nombre>: Debe indicar la cantidad de memoria a reservar (número entero) y el nombre del programa a reservarle su memoria")
+            print("LIBERAR <nombre>: Debe indicar el nombre del programa a liberarle su memoria")
+            print("MOSTRAR: Muestra el estado de la memoria")
+            print("HELP: muestra este mensaje")
+            print("SALIR: sale del programa")
+            print("PROG: muestra la lista de programas almacenados\n")
 
 if __name__ == "__main__":
     main()
