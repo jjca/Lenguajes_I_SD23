@@ -34,11 +34,25 @@ Church sucesorn (int n)
     printf("Uwito %s",b.valor);
     return b;
 }
-
+/*
 Church sumaChurch (Church a, Church b)
 {
+    Church *res = NULL;
+    res = (Church*)malloc(sizeof(Church));
+    if (a.sucesor == NULL)
+    {
+        res.sucesor->sucesor(b);
+    }
+    else if (b.sucesor == NULL)
+    {
+        res.sucesor = sucesor(a);
+    }
+    else
+    {
+        res.sucesor(sumaChurch(sucesor(a),b)
+    }
 
-}
+}*/
 
 int main() {
     
@@ -53,6 +67,8 @@ int main() {
 
     Church uno = sucesor(zero);
     Church dos = sucesor(uno);
+    printf("El sucesor de cero es: %s\n",zero.sucesor);
+    printf("El sucesor de uno es: %s\n",uno.sucesor);
     printf("El valor de uno es: %s\n",uno.valor);
     printf("El valor de dos es: %s\n",dos.valor);
     sucesorn(5);
