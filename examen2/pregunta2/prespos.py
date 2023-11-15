@@ -92,8 +92,14 @@ def transPreToIn(string):
                     print(f"La nueva exprsion deberia ser:{newexpr}")
                     exprFinal.append(newexpr)
                     stack.append(newexpr)
+                elif precOld == precNew and not sonConmutativos and operador != "-":
+                    print("No requiere parentesis parte 2")
+                    #newexpr = "("+expr1+")"+operador+expr2
+                    exprFinal.append(newexpr)
+                    stack.append(newexpr)
+                    print(newexpr)
                 elif precOld > precNew and sonConmutativos:
-                    print("requiere parentesis parte 2")
+                    print("requiere parentesis parte 3")
                     newexpr = "("+expr1+")"+operador+expr2
                     exprFinal.append(newexpr)
                     stack.append(newexpr)
