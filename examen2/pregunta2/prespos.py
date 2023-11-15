@@ -25,14 +25,37 @@ class commandWrongSyntax(Exception):
 
 def evalPrefijo(string):
     stack = []
-    print(string)
-    for elem in string:
-        if re.match(r"[0-9]",elem):
+    print(f"string oriignal {string}")
+    for elem in string[::-1]:
+        if re.match(r"[0-9]+",elem):
             print(f"{elem} es un numero")
+            stack.append(elem)
         else:
             print(f"{elem} es un operador")
+            num1 = stack.pop()
+            num2 = stack.pop()
+            operador = elem
+            res = eval(num2+""+""+operador+""+""+num1)
+            print(f"olaaa {res}")
+            stack.append(str(res))
+    print(stack)
 
-
+def evalPostfijo(string):
+    stack = []
+    print(f"string oriignal {string}")
+    for elem in string:
+        if re.match(r"[0-9]+",elem):
+            print(f"{elem} es un numero")
+            stack.append(elem)
+        else:
+            print(f"{elem} es un operador")
+            num1 = stack.pop()
+            num2 = stack.pop()
+            operador = elem
+            res = eval(num2+""+""+operador+""+""+num1)
+            print(f"olaaa {res}")
+            stack.append(str(res))
+    print(stack)
 
 def main():
     print("Hola")
@@ -53,6 +76,7 @@ def main():
                                 evalPrefijo(entrada[2:])
                             elif 'post' == orden:
                                 print("postfijo")
+                                evalPostfijo(entrada[2:])
                             else:
                                 raise ValueError
                         except memoryNoAvailable:
