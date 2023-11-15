@@ -57,6 +57,88 @@ def evalPostfijo(string):
             stack.append(str(res))
     print(stack)
 
+def transPreToIn(string):
+    stack = []
+    oldexpr = None
+    exprFinal = []
+    print(f"string oriignal {string}")
+    dictPrec = {"+":"2","-":"2","*":"1","/":"1"}
+    conmutativos = ["+","*"]
+    for elem in string[::-1]:
+        if re.match(r"[0-9]+",elem):
+            print(f"{elem} es un numero")
+            stack.append(elem)
+        else:
+            print(f"{elem} es un operador")
+            expr1 = stack.pop()
+            print(f"expr1 {expr1}")
+            expr2 = stack.pop()
+            print(f"expr2 {expr2}")
+            operador = elem
+            newexpr = expr1+operador+expr2
+            if oldexpr != None:
+                print(f"old del final {oldexpr}")
+                listik = re.findall(r"[+\-*\/]",oldexpr)
+                precOld = dictPrec.get(listik[0])
+                precNew = dictPrec.get(operador)
+                if operador in conmutativos and listik[0] in conmutativos:
+                    sonConmutativos = True
+                else:
+                    sonConmutativos = False
+                print(f"Precedencias: New {operador} = {precNew}, old:{listik[0]} = {precOld}")
+                print(f"el operador {listik[0]} y {operador}. son conmutativos? {sonConmutativos}")
+                if precOld <= precNew and sonConmutativos:
+                    print(f"el operador {listik[0]} tiene mayor o igual precedencia que {operador}. No requiere parentesis")
+                    print(f"La nueva exprsion deberia ser:{newexpr}")
+                    exprFinal.append(newexpr)
+                    stack.append(newexpr)
+                elif precOld > precNew and sonConmutativos:
+                    print("requiere parentesis parte 2")
+                    newexpr = "("+expr1+")"+operador+expr2
+                    exprFinal.append(newexpr)
+                    stack.append(newexpr)
+                    print(newexpr)
+                else:
+                    print("requiere parentesis")
+                    newexpr = expr1+operador+"("+expr2+")"
+                    exprFinal.append(newexpr)
+                    stack.append(newexpr)
+                    
+                    print(newexpr)
+                print(listik)
+                oldexpr = newexpr
+            else:
+                exprFinal.append(newexpr)
+                stack.append(newexpr)
+            oldexpr = newexpr
+        
+    i = 0
+    j = 0
+    posParentesis = []
+    for elem in newexpr:      
+        if re.match(r"\(",elem):
+            posParentesis.append({i:j})
+            j += 1
+        elif elem == ")":
+            j -= 1
+            posParentesis.append({i:j})
+            
+            
+        i +=1
+    print(posParentesis)
+    print(exprFinal)
+    outputString = []
+    precedenciaAnterior = 0
+    """ while len(numstack) > 0:
+        elem = numstack.pop()
+        outputString.insert(0, elem)
+        operador = opstack.pop()
+        precedenciaActual = dictPrec.get(operador)
+        if precedenciaAnterior > """
+
+    
+
+
 def main():
     print("Hola")
     activo = True
@@ -109,6 +191,7 @@ def main():
                     continue
             elif 'mostrar' == entrada[0].lower():
                 print("Memoria en uso:")
+                transPreToIn(entrada[1:])
             elif 'help' == entrada[0].lower() and len(entrada) == 1:
                 print("\nLos siguientes comandos están disponibles:")
                 print("EVAL <orden> <expr>: Evalúa la expresión dada en la notación indicada. Orden puede ser PRE o POST")
