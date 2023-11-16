@@ -37,7 +37,7 @@ def evalPrefijo(string):
             operador = elem
             if operador == "/":
                 operador = "//"
-            res = eval(num2+""+""+operador+""+""+num1)
+            res = eval(num1+""+""+operador+""+""+num2)
             print(f"olaaa {res}")
             stack.append(str(res))
     print(stack)
@@ -121,7 +121,7 @@ def transPostToIn(string):
             if operadorExpr1 is not None and dictPrec.get(operador) == dictPrec.get(operadorExpr1) and operador not in conmutativos: 
                 print(f"ELIF 4 : La precedencia del operador {operador} es mayor a la de {operadorExpr2}")
                 expr2 = "("+expr1+")"
-            newexpr = expr2+operador+expr1
+            newexpr = expr1+operador+expr2
             stack.append((newexpr,operador))
             print(newexpr)
                 
