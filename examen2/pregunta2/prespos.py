@@ -35,6 +35,8 @@ def evalPrefijo(string):
             num1 = stack.pop()
             num2 = stack.pop()
             operador = elem
+            if operador == "/":
+                operador = "//"
             res = eval(num2+""+""+operador+""+""+num1)
             print(f"olaaa {res}")
             stack.append(str(res))
@@ -52,6 +54,8 @@ def evalPostfijo(string):
             num1 = stack.pop()
             num2 = stack.pop()
             operador = elem
+            if operador == "/":
+                operador = "//"
             res = eval(num2+""+""+operador+""+""+num1)
             print(f"olaaa {res}")
             stack.append(str(res))
@@ -62,88 +66,67 @@ def transPreToIn(string):
     oldexpr = None
     exprFinal = []
     print(f"string oriignal {string}")
-    dictPrec = {"+":"2","-":"2","*":"1","/":"1"}
+    dictPrec = {"+":"1","-":"1","*":"2","/":"2"}
     conmutativos = ["+","*"]
     for elem in string[::-1]:
         if re.match(r"[0-9]+",elem):
             print(f"{elem} es un numero")
-            stack.append(elem)
+            stack.append((elem,None))
         else:
             print(f"{elem} es un operador")
-            expr1 = stack.pop()
-            print(f"expr1 {expr1}")
-            expr2 = stack.pop()
-            print(f"expr2 {expr2}")
+            expr1, operadorExpr1 = stack.pop()
+            print(f"expr1 {expr1,operadorExpr1}")
+            expr2, operadorExpr2 = stack.pop()
+            print(f"expr2 {expr2,operadorExpr2}")
             operador = elem
+            if operadorExpr1 is not None and dictPrec.get(operador) > dictPrec.get(operadorExpr1): 
+                print(f"ELIF 2 : La precedencia del operador {operador} es mayor a la de {operadorExpr1}")
+                expr1 = "("+expr1+")"
+            if operadorExpr2 is not None and dictPrec.get(operador) > dictPrec.get(operadorExpr2): 
+                print(f"ELIF 3 : La precedencia del operador {operador} es mayor a la de {operadorExpr2}")
+                expr2 = "("+expr2+")"
+            if operadorExpr2 is not None and dictPrec.get(operador) == dictPrec.get(operadorExpr2) and operador not in conmutativos: 
+                print(f"ELIF 4 : La precedencia del operador {operador} es mayor a la de {operadorExpr2}")
+                expr2 = "("+expr2+")"
             newexpr = expr1+operador+expr2
-            if oldexpr != None:
-                print(f"old del final {oldexpr}")
-                listik = re.findall(r"[+\-*\/]",oldexpr)
-                precOld = dictPrec.get(listik[0])
-                precNew = dictPrec.get(operador)
-                if operador in conmutativos and listik[0] in conmutativos:
-                    sonConmutativos = True
-                else:
-                    sonConmutativos = False
-                print(f"Precedencias: New {operador} = {precNew}, old:{listik[0]} = {precOld}")
-                print(f"el operador {listik[0]} y {operador}. son conmutativos? {sonConmutativos}")
-                if precOld <= precNew and sonConmutativos:
-                    print(f"el operador {listik[0]} tiene mayor o igual precedencia que {operador}. No requiere parentesis")
-                    print(f"La nueva exprsion deberia ser:{newexpr}")
-                    exprFinal.append(newexpr)
-                    stack.append(newexpr)
-                elif precOld == precNew and not sonConmutativos and operador != "-":
-                    print("No requiere parentesis parte 2")
-                    #newexpr = "("+expr1+")"+operador+expr2
-                    exprFinal.append(newexpr)
-                    stack.append(newexpr)
-                    print(newexpr)
-                elif precOld > precNew and sonConmutativos:
-                    print("requiere parentesis parte 3")
-                    newexpr = "("+expr1+")"+operador+expr2
-                    exprFinal.append(newexpr)
-                    stack.append(newexpr)
-                    print(newexpr)
-                else:
-                    print("requiere parentesis")
-                    newexpr = expr1+operador+"("+expr2+")"
-                    exprFinal.append(newexpr)
-                    stack.append(newexpr)
-                    
-                    print(newexpr)
-                print(listik)
-                oldexpr = newexpr
-            else:
-                exprFinal.append(newexpr)
-                stack.append(newexpr)
-            oldexpr = newexpr
-        
-    i = 0
-    j = 0
-    posParentesis = []
-    for elem in newexpr:      
-        if re.match(r"\(",elem):
-            posParentesis.append({i:j})
-            j += 1
-        elif elem == ")":
-            j -= 1
-            posParentesis.append({i:j})
-            
-            
-        i +=1
-    print(posParentesis)
-    print(exprFinal)
-    outputString = []
-    precedenciaAnterior = 0
-    """ while len(numstack) > 0:
-        elem = numstack.pop()
-        outputString.insert(0, elem)
-        operador = opstack.pop()
-        precedenciaActual = dictPrec.get(operador)
-        if precedenciaAnterior > """
+            stack.append((newexpr,operador))
+            print(newexpr)
+                
+    exprFinal.append(newexpr)
+    print(exprFinal[-1])
 
-    
-
+def transPostToIn(string):
+    stack = []
+    exprFinal = []
+    print(f"string oriignal {string}")
+    dictPrec = {"+":"1","-":"1","*":"2","/":"2"}
+    conmutativos = ["+","*"]
+    for elem in string:
+        if re.match(r"[0-9]+",elem):
+            print(f"{elem} es un numero")
+            stack.append((elem,None))
+        else:
+            print(f"{elem} es un operador")
+            expr1, operadorExpr1 = stack.pop()
+            print(f"expr1 {expr1,operadorExpr1}")
+            expr2, operadorExpr2 = stack.pop()
+            print(f"expr2 {expr2,operadorExpr2}")
+            operador = elem
+            if operadorExpr2 is not None and dictPrec.get(operador) < dictPrec.get(operadorExpr2): 
+                print(f"ELIF 2 : La precedencia del operador {operador} es mayor a la de {operadorExpr1}")
+                expr1 = "("+expr2+")"
+            if operadorExpr1 is not None and dictPrec.get(operador) < dictPrec.get(operadorExpr1): 
+                print(f"ELIF 3 : La precedencia del operador {operador} es mayor a la de {operadorExpr2}")
+                expr2 = "("+expr1+")"
+            if operadorExpr1 is not None and dictPrec.get(operador) == dictPrec.get(operadorExpr1) and operador not in conmutativos: 
+                print(f"ELIF 4 : La precedencia del operador {operador} es mayor a la de {operadorExpr2}")
+                expr2 = "("+expr1+")"
+            newexpr = expr2+operador+expr1
+            stack.append((newexpr,operador))
+            print(newexpr)
+                
+    exprFinal.append(newexpr)
+    print(exprFinal[-1])
 
 def main():
     print("Hola")
@@ -196,8 +179,29 @@ def main():
                     print("El comando está incorrecto")
                     continue
             elif 'mostrar' == entrada[0].lower():
-                print("Memoria en uso:")
-                transPreToIn(entrada[1:])
+                try:
+                    if len(entrada) > 3:
+                        orden = entrada[1].lower()
+                        try: 
+                            if 'pre' == orden:
+                                print("Prefijo")
+                                transPreToIn(entrada[2:])
+                            elif 'post' == orden:
+                                print("postfijo")
+                                transPostToIn(entrada[2:])
+                            else:
+                                raise ValueError
+                        except memoryNoAvailable:
+                            print("uwu")
+                            continue
+                    else:
+                        raise commandIncomplete
+                except commandIncomplete:
+                    print("Faltan argumentos en el comando MOSTRAR")
+                    continue
+                except commandWrongSyntax:
+                    print("El comando está incorrecto")
+                    continue
             elif 'help' == entrada[0].lower() and len(entrada) == 1:
                 print("\nLos siguientes comandos están disponibles:")
                 print("EVAL <orden> <expr>: Evalúa la expresión dada en la notación indicada. Orden puede ser PRE o POST")
