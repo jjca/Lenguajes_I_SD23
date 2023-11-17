@@ -6,9 +6,6 @@ def main():
 
     for i in range(0,55):
         print(f"i = {i} F(i) = {elJojeNacci(i)}")
-
-
-
     for i in range(1,50):
         print(f"i ={i}, F({i}) - F({i-1}): {elJojeNacci(i)-elJojeNacci(i-1)}")
 
@@ -21,12 +18,12 @@ def main():
     print(f"el de 38: {tailJojeNacci(38)}")
     print(f"el de 39: {tailJojeNacci(39)}")
 
-    print(f"el de 90: {elJojeNacci(90)}")
-    print(f"el de 90: {tailJojeNacci(90)}")
+    print(f"el de 90: {elJojeNacci(5)}")
+    print(f"el de 90: {tailJojeNacci(200)}")
 
-    """ print("Iterativos")
+    print("Iterativos")
     print(f"el de 24: {jojeNacciIter(24)}")
-    print(f"el de 35: {jojeNacciIter(35)}") """
+    print(f"el de 35: {jojeNacciIter(200)}")
 
 def elJojeNacci(n):
     if n < 0:
@@ -59,19 +56,14 @@ def tailJojeNacci(n):
 
 
 def jojeNacciIter(n):
+    lalistik = list(range(35))
     suma = 0
     i = 0
-    if n < 0:
-        print("error")
-    elif 0 <= n < 35:
-        return n+suma
-    else:
-        while i == 1:
-            if i == 7:
-                suma = 7*suma
-            else:
-                suma = suma
-        return suma
+    for i in range(n):
+        lalistik.append(lalistik[28]+lalistik[21]+lalistik[14]+lalistik[7]+lalistik[0])
+        lalistik = lalistik[1:]
+    return lalistik[0]
+
 
 if __name__ == "__main__":
     main()
