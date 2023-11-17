@@ -25,6 +25,7 @@ Church* sucesor(Church* a)
     b->valor = malloc(strlen(tmp));
     strncpy(b->valor,tmp,strlen(tmp));
     free(tmp);
+    free(av);
     return b;
 }
 
