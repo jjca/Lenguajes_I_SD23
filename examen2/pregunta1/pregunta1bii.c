@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 typedef struct Nodo Nodo;
+
 struct Nodo {
     struct Nodo* hijoIzq;
     struct Nodo* hijoDer;
@@ -17,150 +18,151 @@ Nodo* nuevoNodo(int valor)
     return nodo;
 }
 
-/* binTree* inicializar(Church* a)
+int conteoNodos(Nodo *nodo)
 {
-    Church *b = NULL;
-    b = (Church*)malloc(sizeof(Church));
-    a->sucesor = b;
-    b->numero = a->numero+1;
-    char *av = (char*)malloc(sizeof(a->valor));
-    av = a->valor;
-    char *tmp = (char*)malloc(strlen(av)+5);
-    char *tmp2 = ")";
-    char *base = "Suc(";
-    strncat(tmp,base,4);
-    strncat(tmp,av,strlen(av));
-    strncat(tmp,tmp2,1);
-    b->valor = malloc(strlen(tmp));
-    strncpy(b->valor,tmp,strlen(tmp));
-    free(tmp);
-    return b;
+    if (nodo == NULL)
+    {
+        return 0;
+    }
+    int conteoIzq = conteoNodos(nodo->hijoIzq);
+    int conteoDer = conteoNodos(nodo->hijoDer);
+
+    return 1 + conteoDer + conteoIzq;
+
 }
- */
-/* Church* sucesorn (int n)
+
+void recorridoPreorder(Nodo *nodo, int *array, int *index)
 {
-    Church *zero = NULL;
-    zero = (Church*)malloc(sizeof(Church));
-    zero->valor = (char*)malloc(sizeof(char));
-    zero->valor = "zero";
-    zero->numero = 0;
-    Church *b = NULL;
-    b = (Church*)malloc(sizeof(Church));
-    b = sucesor(zero);
-    for (int i = 0; i < n; i++)
+    if (nodo == NULL)
+    {
+        return;
+    }
+    array[(*index)++] = nodo->valor;
+    recorridoPreorder(nodo->hijoIzq,array,index);
+    recorridoPreorder(nodo->hijoDer,array,index);
+}
+
+
+void recorridoPostorder(Nodo *nodo, int *array, int *index)
+{    
+    if (nodo == NULL)
+    {
+        return;
+    }
+    recorridoPostorder(nodo->hijoIzq, array, index);
+    recorridoPostorder(nodo->hijoDer, array, index);
+    array[(*index)++] = nodo->valor;
+}
+
+int esSimetrico(int *orden_preorder, int *orden_postorder,int tamanoArbol)
+{
+    int iguales = 1;
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        if (orden_postorder[i] != orden_preorder[i])
         {
-            b = sucesor(b);
-        };
-    free(zero);
-    return b;
-}
-
-Church *sumaChurch (Church *a, Church *b)
-{
-    Church *res = NULL;
-    res = (Church*)malloc(sizeof(Church));
-    if (a->valor == "zero")  
-    {
-        printf("El if");
-        res = b;
+            iguales = 0;
+            return iguales;
+        }
     }
-    else if (b->valor == "zero")
-    {
-        printf("Else if 1");
-        res = a;
-    }
-    else
-    {
-        printf("Else\n");
-        int num = a->numero+b->numero;
-        res = sucesorn(num-1);
-    }
-    return res;
-}
-
-Church *multChurch (Church *a, Church *b)
-{
-    Church *res = NULL;
-    res = (Church*)malloc(sizeof(Church));
-    if (a->valor == "zero")  
-    {
-        printf("El if");
-        res = a;
-    }
-    else if (b->valor == "zero")
-    {
-        res = b;
-    }
-    else
-    {
-        printf("Else\n");
-        int num = a->numero*b->numero;
-        res = sucesorn(num-1);
-    }
-    return res;
-}
- */
-
-void recorridoPreorder(Nodo *nodo)
-{
-    if (nodo == NULL)
-    {
-        return;
-    }
-    
-    printf(" %d \n",nodo->valor);
-
-    recorridoPreorder(nodo->hijoIzq);
-    recorridoPreorder(nodo->hijoDer);
-}
-
-
-void recorridoPostorder(Nodo *nodo)
-{
-    if (nodo == NULL)
-    {
-        return;
-    }
-
-    recorridoPostorder(nodo->hijoIzq);
-    recorridoPostorder(nodo->hijoDer);
-    printf(" %d \n",nodo->valor);
+    return iguales;
 }
 
 int main() {
     Nodo *root = NULL;
-    root = nuevoNodo(1);
-    root->hijoDer = nuevoNodo(3);
-    root->hijoIzq = nuevoNodo(2);
-    root->hijoIzq->hijoIzq = nuevoNodo(4);
+    root = nuevoNodo(8);
+    printf("Caso trivial: sólo hay un nodo\n");
+    int tamanoArbol = conteoNodos(root);
+    int *orden_preorder = (int*)malloc(tamanoArbol*sizeof(int));
+    int index = 0;
+
+    recorridoPreorder(root, orden_preorder, &index);
+
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_preorder[i]);
+    }
+    
+    printf("\n\n");
+    index = 0;
+    
+    int *orden_postorder = (int*)malloc(tamanoArbol*sizeof(int));
+    recorridoPostorder(root, orden_postorder, &index);
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_postorder[i]);
+    }
+    int iguales = esSimetrico(orden_preorder,orden_postorder,tamanoArbol);
+    printf("Son iguales? %d \n",iguales);
+    free(orden_preorder);
+    free(orden_postorder);
+    //////////////////////////////////////////
+    printf("Caso dos: todos los nodos tienen el mismo valor\n");
+    free(root);
+    root = nuevoNodo(5);
+    root->hijoDer = nuevoNodo(5);
+    root->hijoIzq = nuevoNodo(5);
+    root->hijoIzq->hijoIzq = nuevoNodo(5);
     root->hijoIzq->hijoDer = nuevoNodo(5);
-    root->hijoDer->hijoDer = nuevoNodo(6);
-    /* char tmp[36] = "Suc(";
-    char *tmp2 = ")";
-    strncat(tmp,a.valor,sizeof(tmp));
-    strncat(tmp,tmp2,1);
-    strncat(b.valor,tmp,sizeof(tmp)); */
-    printf("El valor del root es %d\n",root->valor);
-    recorridoPreorder(root);
-    printf("Postorder\n");
-    recorridoPostorder(root);
-    /* Church *dos = sucesor(uno); 
-    Church *tres = sucesor(dos);
-    Church *cuatro = sucesor(tres);
-    Church *cinco = sucesor(cuatro);
-    Church *seis = sucesor(cinco);
-    Church *siete = sucesor(seis);
-     *//*printf("El valor de cero es %s\n",zero->valor);
-    printf("El sucesor de cero es: %s y su valor es: %s \n",zero->sucesor,uno->valor);
-    printf("El sucesor de uno es: %s\n",uno->sucesor);
-    printf("El valor de uno es: %s\n",uno->valor);
-    printf("El valor de dos es: %s\n",dos->valor);*/
-    //Church *seis = sucesorn(10,zero);
- /*    printf("Hola! %s\n",seis->valor);
-    Church *suma = sumaChurch(cuatro,seis);
-    printf("Rsultado de la suma: 4+6: %s\n",suma->valor);
-    Church *prod = multChurch(seis,dos);
-    printf("Rsultado del producto: 6*2 %s\n",prod->valor); */
-    //printf("%d \n",zero.zero);
+    root->hijoDer->hijoDer = nuevoNodo(5);
+    root->hijoDer->hijoIzq = nuevoNodo(5);
+    tamanoArbol = conteoNodos(root);
+    index = 0;
+    orden_preorder = (int*)malloc(tamanoArbol*sizeof(int));
+    orden_postorder = (int*)malloc(tamanoArbol*sizeof(int));
+    recorridoPreorder(root, orden_preorder, &index);
+
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_preorder[i]);
+    }
+    
+    printf("\n\n");
+    index = 0;
+   
+    recorridoPostorder(root, orden_postorder, &index);
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_postorder[i]);
+    }
+    iguales = esSimetrico(orden_preorder,orden_postorder,tamanoArbol);
+    printf("Son iguales? %d \n",iguales);
+    free(orden_preorder);
+    free(orden_postorder);
+
+
+    //////////////////////////////////////////
+    printf("Caso tres: todos los nodos diferentes. Este caso NO es simetrico\n");
+    free(root);
+    root = nuevoNodo(8);
+    root->hijoDer = nuevoNodo(5);
+    root->hijoIzq = nuevoNodo(5);
+    root->hijoIzq->hijoIzq = nuevoNodo(2);
+    root->hijoIzq->hijoDer = nuevoNodo(3);
+    root->hijoDer->hijoDer = nuevoNodo(3);
+    root->hijoDer->hijoIzq = nuevoNodo(2);
+    tamanoArbol = conteoNodos(root);
+    index = 0;
+    orden_preorder = (int*)malloc(tamanoArbol*sizeof(int));
+    orden_postorder = (int*)malloc(tamanoArbol*sizeof(int));
+    recorridoPreorder(root, orden_preorder, &index);
+
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_preorder[i]);
+    }
+    
+    printf("\n\n");
+    index = 0;
+   
+    recorridoPostorder(root, orden_postorder, &index);
+    for (int i = 0; i < tamanoArbol; i++)
+    {
+        printf("%d \n",orden_postorder[i]);
+    }
+    iguales = esSimetrico(orden_preorder,orden_postorder,tamanoArbol);
+    printf("Son iguales? %d \n",iguales);
+    free(orden_preorder);
+    free(orden_postorder);
     return 0;
 }
