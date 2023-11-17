@@ -4,7 +4,7 @@ def main():
     print(elJojeNacci(30))
     print(elJojeNacci(60))
 
-    for i in range(0,50):
+    for i in range(0,55):
         print(f"i = {i} F(i) = {elJojeNacci(i)}")
 
 
@@ -16,10 +16,17 @@ def main():
     print(f"el de 34: {tailJojeNacci(34)}")
     print(f"el de 35: {tailJojeNacci(35)}")
 
+    print(f"el de 36: {tailJojeNacci(36)}")
+    print(f"el de 37: {tailJojeNacci(37)}")
+    print(f"el de 38: {tailJojeNacci(38)}")
+    print(f"el de 39: {tailJojeNacci(39)}")
 
-    print("Iterativos")
+    print(f"el de 90: {elJojeNacci(90)}")
+    print(f"el de 90: {tailJojeNacci(90)}")
+
+    """ print("Iterativos")
     print(f"el de 24: {jojeNacciIter(24)}")
-    print(f"el de 35: {jojeNacciIter(35)}")
+    print(f"el de 35: {jojeNacciIter(35)}") """
 
 def elJojeNacci(n):
     if n < 0:
@@ -40,21 +47,26 @@ def fib(n):
     return go(n)
             
 def tailJojeNacci(n):
-    def ayudante(a = 0, b = 1, i = 0):
+    lalistik = list(range(35))
+    def tailJojeNacciAux(n, i, lalistik):
         if i == n:
-            return a
-        else:
-            return ayudante(b,a+b,i+1)
-    return ayudante(n)
+            return lalistik[0]
+        else:         
+            lalistik.append(lalistik[28]+lalistik[21]+lalistik[14]+lalistik[7]+lalistik[0])
+            lalistik = lalistik[1:]
+            return tailJojeNacciAux(n, i+1, lalistik)
+    return tailJojeNacciAux(n,0,lalistik)
+
 
 def jojeNacciIter(n):
     suma = 0
+    i = 0
     if n < 0:
         print("error")
     elif 0 <= n < 35:
         return n+suma
     else:
-        for i in range(0,7):
+        while i == 1:
             if i == 7:
                 suma = 7*suma
             else:
