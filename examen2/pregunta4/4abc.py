@@ -1,15 +1,25 @@
+import time
 def main():
-    print(elJojeNacci(10))
-    print(elJojeNacci(20))
-    print(elJojeNacci(30))
-    print(elJojeNacci(60))
+    for i in range(35,105,10):
+            start_time = time.time()
+            print(f"i = {i} F(i) = {tailJojeNacci(i)}")
+            print("timepo: %s segundos" % (time.time()-start_time))
 
-    for i in range(0,55):
-        print(f"i = {i} F(i) = {elJojeNacci(i)}")
-    for i in range(1,50):
-        print(f"i ={i}, F({i}) - F({i-1}): {elJojeNacci(i)-elJojeNacci(i-1)}")
+    for i in range(105,1000,100):
+            start_time = time.time()
+            print(f"i = {i} F(i) = {tailJojeNacci(i)}")
+            print("timepo: %s segundos" % (time.time()-start_time))
 
-    #print(f"Fibo {fib(50)}")
+    for i in range(35,105,10):
+            start_time = time.time()
+            print(f"i = {i} F(i) = {jojeNacciIter(i)}")
+            print("timepo: %s segundos" % (time.time()-start_time))
+
+    for i in range(105,1006,100):
+            start_time = time.time()
+            print(f"i = {i} F(i) = {jojeNacciIter(i)}")
+            print("timepo: %s segundos" % (time.time()-start_time))
+    """ #print(f"Fibo {fib(50)}")
     print(f"el de 34: {tailJojeNacci(34)}")
     print(f"el de 35: {tailJojeNacci(35)}")
 
@@ -23,7 +33,7 @@ def main():
 
     print("Iterativos")
     print(f"el de 24: {jojeNacciIter(24)}")
-    print(f"el de 35: {jojeNacciIter(200)}")
+    print(f"el de 35: {jojeNacciIter(200)}") """
 
 
 """
