@@ -217,9 +217,35 @@ union nums
 En este caso, el tamaño reservado del union `nums` es del tamaño del float en memoria. Si se asigna un valor a `num` y luego a `num2`, sobreescribirá en memoria estos valores.
 
 C no tiene soporte para polimorfismo de forma nativa.
+
+##### Enums
+
+Es un tipo de datos definido por el usuario, con la intención de definir constantes para una variable única de enumeración. Se definen:
+
+```C
+enum vocales {a,e,i,o,u};
+```
+
+Con esto se definió el `enum` llamado `vocales`. Para instanciar una variable se hace:
+```C
+enum vocales {a,e,i,o,u};
+enum vocales voc;
+voc = a;
+```
+
+La idea de esto, es que al asignarle `voc = a`,  el valor asociado a la variable `voc` va a ser 0, ya que los `enum` enumeran sus elementos desde el 0, por lo tanto, $a = 0, e = 1, i = 2, o = 3, u = 4$.
+
+Es posible también establecer los valores iniciales para los enum, por ejemplo:
+```C
+enum vocales {a=1,e,i,o,u};
+```
+En este caso empezamos a contar desde el 1 en vez del 0.
+
 ### 4
 
-C usa equivalencia estructural para todos los tipos excepto para los structs .
-C no posee inferencia de tipos.
-
-4. Describa el funcionamiento del sistema de tipos del lenguaje, incluyendo el tipo de equivalencia para sus tipos, reglas de compatibilidad y capacidades de inferencias de tipos.
+- C es estáticamente tipado. Todas las variables deben declararse con su tipo de datos, además que se chequea a tiempo de compilación.
+- C usa equivalencia estructural para todos los tipos excepto para los structs, donde usa equivalencia de nombres. De forma que para operar dos variables, verifica los tipos para evitar por ejemplo sumar un char con un int.
+- C no posee inferencia de tipos.
+- C permite convertir tipos usando el casting, pero esto solo se puede para tipos explícitos.
+- C realiza cierta coerción de tipos para los números, donde permite realizar una operaciones entre un int y un float. También se puede realizar reasignaciones a variables de diferentes tipos, pero esto puede afectar al tipo de acuerdo a la conversión necesaria.
+- C posee el tipo `void*` para definir un tipo de referencia universal.
