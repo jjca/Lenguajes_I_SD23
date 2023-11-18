@@ -25,6 +25,12 @@ def main():
     print(f"el de 24: {jojeNacciIter(24)}")
     print(f"el de 35: {jojeNacciIter(200)}")
 
+
+"""
+Pregunta 4a.
+Recibe un número n del cual retorna recursivamente 
+F(n-7) + F(n-14) + F(n-21) + F(n-28) + F(n-35)
+"""
 def elJojeNacci(n):
     if n < 0:
         print("error")
