@@ -1,3 +1,7 @@
+
+"""
+Función que itera sobre la lista de particiones y extrae solo los que están en orden creciente
+"""
 def obtenerCrecientes(lista):
     crecientes = []
     for i in range(0,len(lista)):
@@ -6,6 +10,10 @@ def obtenerCrecientes(lista):
             #print(f"{lista[i]}")
     return crecientes
 
+"""
+Función que tiene el iterador para obtener particiones.
+Se llama recursivamente.
+"""
 def obtenerParticiones(lista):
     if lista == []:
         yield []

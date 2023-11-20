@@ -19,22 +19,6 @@ def main():
             start_time = time.time()
             print(f"i = {i} F(i) = {jojeNacciIter(i)}")
             print("timepo: %s segundos" % (time.time()-start_time))
-    """ #print(f"Fibo {fib(50)}")
-    print(f"el de 34: {tailJojeNacci(34)}")
-    print(f"el de 35: {tailJojeNacci(35)}")
-
-    print(f"el de 36: {tailJojeNacci(36)}")
-    print(f"el de 37: {tailJojeNacci(37)}")
-    print(f"el de 38: {tailJojeNacci(38)}")
-    print(f"el de 39: {tailJojeNacci(39)}")
-
-    print(f"el de 90: {elJojeNacci(5)}")
-    print(f"el de 90: {tailJojeNacci(200)}")
-
-    print("Iterativos")
-    print(f"el de 24: {jojeNacciIter(24)}")
-    print(f"el de 35: {jojeNacciIter(200)}") """
-
 
 """
 Pregunta 4a.
@@ -49,16 +33,10 @@ def elJojeNacci(n):
     else:
         return elJojeNacci(n-7) + elJojeNacci(n-14) + elJojeNacci(n-21) + elJojeNacci(n-28) + elJojeNacci(n-35)
     
-def fib(n):
-    def go(n,a =0,b=1):
-        if n == 0:
-            return a
-        elif n == 1:
-            return b
-        else:
-            return go(n-1,b,a+b)
-    return go(n)
-            
+"""
+Función dada definida como recursiva de cola.
+En este caso recibe un n y retorna el valor
+"""            
 def tailJojeNacci(n):
     lalistik = list(range(35))
     def tailJojeNacciAux(n, i, lalistik):
@@ -70,10 +48,12 @@ def tailJojeNacci(n):
             return tailJojeNacciAux(n, i+1, lalistik)
     return tailJojeNacciAux(n,0,lalistik)
 
-
+"""
+Función de ejecución de recursión de cola iterativa.
+Se trasladó el append de la lista y simplemente se itera sobre esta hasta obtener el resultado.
+"""
 def jojeNacciIter(n):
     lalistik = list(range(35))
-    suma = 0
     i = 0
     for i in range(n):
         lalistik.append(lalistik[28]+lalistik[21]+lalistik[14]+lalistik[7]+lalistik[0])

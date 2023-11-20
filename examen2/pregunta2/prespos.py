@@ -6,6 +6,11 @@ class commandWrongSyntax(Exception):
     "El comando está incorrecto"
     pass
 
+"""
+Función que imprime el stack de evaluar la expresión en prefijo. 
+Recibe el string a ser procesado.
+"""
+
 def evalPrefijo(string):
     stack = []
     for elem in string[::-1]:
@@ -21,6 +26,10 @@ def evalPrefijo(string):
             stack.append(str(res))
     print(stack[0])
 
+"""
+Función que imprime el stack con el resultado de evaluar la expresión postfija.
+Recibe el string a ser procesado
+"""
 def evalPostfijo(string):
     stack = []
     for elem in string:
@@ -36,8 +45,12 @@ def evalPostfijo(string):
             stack.append(str(res))
     print(stack[0])
 
+"""
+Función que traduce la expresión en prefijo a infijo
+"""
 def transPreToIn(string):
     stack = []
+    # Diccionario de precedencias
     dictPrec = {"+":"1","-":"1","*":"2","/":"2"}
     conmutativos = ["+","*"]
     for elem in string[::-1]:
@@ -57,6 +70,10 @@ def transPreToIn(string):
             stack.append((newexpr,operador))
     print(newexpr)
 
+"""
+Función que traduce de postfijo a infijo.
+Imprime la traducción
+"""
 def transPostToIn(string):
     stack = []
     dictPrec = {"+":"1","-":"1","*":"2","/":"2"}

@@ -2,12 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 typedef struct Church Church;
+
+/*
+Struct que define formalmente a un número de Church
+Pueden tener un valor en tipo Char, el que representa su expresión en términos de numerales de
+Church. Ej: Suc(Zero)
+El valor de dicho número en notación arábiga.
+Sucesor como un pointer de tipo Church*
+*/
 struct Church {
     struct Church* sucesor;
     char *valor;
     int numero;
 };
 
+
+/*
+Función que define un sucesor de Church.
+Recibe un pointer y retorna otro pointer para el nuevo sucesor.
+*/
 Church* sucesor(Church* a)
 {
     Church *b = NULL;
@@ -28,7 +41,10 @@ Church* sucesor(Church* a)
     free(av);
     return b;
 }
-
+/*
+Funcion que define el sucesor de un número n dado
+Recibe un int y retorna un pointer de tipo Church con el sucesor de dicho n dado
+*/
 Church* sucesorn (int n)
 {
     Church *zero = NULL;
@@ -46,7 +62,10 @@ Church* sucesorn (int n)
     free(zero);
     return b;
 }
-
+/*
+Función para la suma de dos numerales de Church
+Recibe dos numerales, retorna un número.
+*/
 Church *sumaChurch (Church *a, Church *b)
 {
     Church *res = NULL;
@@ -66,7 +85,9 @@ Church *sumaChurch (Church *a, Church *b)
     }
     return res;
 }
-
+/*
+Función para la multiplicación de dos numerales de Church. Recibe dos numerales y retorna uno.
+*/
 Church *multChurch (Church *a, Church *b)
 {
     Church *res = NULL;
@@ -93,31 +114,23 @@ int main() {
     zero->valor = (char*)malloc(sizeof(char));
     zero->valor = "zero";
     zero->numero = 0;
-    /* char tmp[36] = "Suc(";
-    char *tmp2 = ")";
-    strncat(tmp,a.valor,sizeof(tmp));
-    strncat(tmp,tmp2,1);
-    strncat(b.valor,tmp,sizeof(tmp)); */
     Church *uno = sucesor(zero);
     printf("El sucesor de zero es: %p\n",&zero->sucesor);
     printf("El valor del sucesor de cero es %s\n",uno->valor);
+    /*
+    Aqui hay números del 2 al 7 definidos como Church en base al sucesor de su predecesor, desde el cero.
+    */
     Church *dos = sucesor(uno); 
     Church *tres = sucesor(dos);
     Church *cuatro = sucesor(tres);
     Church *cinco = sucesor(cuatro);
     Church *seis = sucesor(cinco);
     Church *siete = sucesor(seis);
-    /*printf("El valor de cero es %s\n",zero->valor);
-    printf("El sucesor de cero es: %s y su valor es: %s \n",zero->sucesor,uno->valor);
-    printf("El sucesor de uno es: %s\n",uno->sucesor);
-    printf("El valor de uno es: %s\n",uno->valor);
-    printf("El valor de dos es: %s\n",dos->valor);*/
-    //Church *seis = sucesorn(10,zero);
     printf("Hola! %s\n",seis->valor);
+    // Operaciones sobre estos numerales ya definidos
     Church *suma = sumaChurch(cuatro,seis);
     printf("Rsultado de la suma: 4+6: %s\n",suma->valor);
     Church *prod = multChurch(seis,dos);
     printf("Rsultado del producto: 6*2 %s\n",prod->valor);
-    //printf("%d \n",zero.zero);
     return 0;
 }
