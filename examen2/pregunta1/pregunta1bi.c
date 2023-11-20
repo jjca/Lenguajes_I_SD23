@@ -53,17 +53,14 @@ Church *sumaChurch (Church *a, Church *b)
     res = (Church*)malloc(sizeof(Church));
     if (a->valor == "zero")  
     {
-        printf("El if");
         res = b;
     }
     else if (b->valor == "zero")
     {
-        printf("Else if 1");
         res = a;
     }
     else
     {
-        printf("Else\n");
         int num = a->numero+b->numero;
         res = sucesorn(num-1);
     }
@@ -76,7 +73,6 @@ Church *multChurch (Church *a, Church *b)
     res = (Church*)malloc(sizeof(Church));
     if (a->valor == "zero")  
     {
-        printf("El if");
         res = a;
     }
     else if (b->valor == "zero")
@@ -85,7 +81,6 @@ Church *multChurch (Church *a, Church *b)
     }
     else
     {
-        printf("Else\n");
         int num = a->numero*b->numero;
         res = sucesorn(num-1);
     }
