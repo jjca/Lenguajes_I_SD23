@@ -44,24 +44,24 @@ class DFS() : Busqueda() {
     override fun buscar(G: Grafo, D: Int, H:Int) : Int {
         val largo = G.listaAdyacencias.keys.size
         val visitados = BooleanArray(largo){false}
-        println(visitados.joinToString())
+  //      println(visitados.joinToString())
         val pila = ArrayDeque<Int>()
         pila.add(D)
-        println(pila)
+    //        println(pila)
         while (pila.size > 0){
             val elem = pila.removeLast()
             if (!visitados.get(elem)){
-                println("No visitado")
+               // println("No visitado")
                 visitados.set(elem,true)
             }
-            println(visitados.joinToString())
+            //println(visitados.joinToString())
             if (visitados.get(H))
             {
                 break
             }
             val adyacentes = G.listaAdyacencias.filterKeys{it.valor == elem}
-            println("alo")
-            println(adyacentes)
+            //println("alo")
+            //println(adyacentes)
             adyacentes.values.forEach{
                 it.forEach{
                     if (!visitados.get(it.valor)){
@@ -76,11 +76,59 @@ class DFS() : Busqueda() {
         }
         if (visitados.get(H))
         {
-            println(visitados.joinToString())
+          //  println(visitados.joinToString())
             return visitados.fold(0){acc, e -> if (e) acc+1 else acc}
         }
         else {
-            println(visitados.joinToString())
+        //    println(visitados.joinToString())
+            return -1
+        }
+    }
+} 
+
+class BFS() : Busqueda() {
+    override fun buscar(G: Grafo, D: Int, H:Int) : Int {
+        val largo = G.listaAdyacencias.keys.size
+        val visitados = BooleanArray(largo){false}
+        //println(visitados.joinToString())
+        val cola = ArrayDeque<Int>()
+        cola.add(D)
+//        println(pila)
+        visitados.set(D,true)
+        while (cola.size > 0){
+            val elem = cola.removeFirst()
+            /* if (!visitados.get(elem)){
+               // println("No visitado")
+                visitados.set(elem,true)
+            } */
+            //println(visitados.joinToString())
+            if (visitados.get(H))
+            {
+                break
+            }
+            val adyacentes = G.listaAdyacencias.filterKeys{it.valor == elem}
+            //println("alo")
+          //  println(adyacentes)
+            adyacentes.values.forEach{
+                it.forEach{
+                    if (!visitados.get(it.valor)){
+                        visitados.set(it.valor,true)
+                        cola.add(it.valor)
+                    }
+                }
+            }
+            if (cola.contains(H)){
+                visitados.set(H,true)
+                break
+            }
+        }
+        if (visitados.get(H))
+        {
+            //println(visitados.joinToString())
+            return visitados.fold(0){acc, e -> if (e) acc+1 else acc}
+        }
+        else {
+            //println(visitados.joinToString())
             return -1
         }
     }
@@ -101,9 +149,15 @@ fun main() {
     grafo1.crearLado(vertice0,vertice5)
     println(grafo1)
     println(grafo1.listaAdyacencias)
+    // Caso donde falla
     println(DFS().buscar(grafo1,1,0))
- /*    println(grafo1.listaAdyacencias.filterKeys{it.valor == 1})
-    println(grafo1.listaAdyacencias.filterKeys{it.valor == 2})
-    println(grafo1.listaAdyacencias.filterKeys{it.valor == 3})
-    println(grafo1.listaAdyacencias.filterKeys{it.valor == 4}) */
+    // Caso con exito
+    println(DFS().buscar(grafo1,1,4))
+
+    println(BFS().buscar(grafo1,1,4))
+
+
+
+
+
 }
