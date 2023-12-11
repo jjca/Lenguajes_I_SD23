@@ -44,7 +44,9 @@ Es posible desactivar el recolector de basura de forma manual.
 
 3. Diga si el lenguaje usa asociación estática o dinámica de métodos y si hay forma de alterar la elección por defecto del lenguaje.
 
-El lenguaje posee asociación estátiac de métodos y no es posible sobrecargar los métodos y propiedades. 
+El lenguaje posee asociación estática de métodos de forma predeterminada pero es psoible usar la asignación dinámica.
+
+Es necesario usar la palabra clave `override` dentro del método a ser sobreescrito, además de que se necesita que el método tenga `open` en la superclase.
 
 4. Describa la jerarquía de tipos, incluyendo mecanismos de herencia múltiple (de haberlos), polimorfismo paramétrico (de tenerlo) y manejo de varianzas.
 
@@ -56,7 +58,7 @@ El tipo `Unit` es un tipo especial para cuando una función no se le especifica 
 
 Kotlin también posee los tipos Byte, Short, Int, Long para números enteros. Float y Double para punto flotante. Está el caso Unsigned equivalente, UByte, UShort, UInt y ULong. Los caracteres se representan con Char, Strings con String y pueden declararse de una sola linea y multilinea.
 
-Fianlemnte, la clase Array para los arreglos de tamaño fijo
+Finalmente, la clase Array para los arreglos de tamaño fijo
 
 No hay herencia múltiple tampoco, pero sí aplica para interfaces.
 
@@ -64,4 +66,6 @@ Kotlin tiene polimorfismo general, y a tiempo de compilación. Es posible sobree
 
 Kotlin no tiene los mismos genéricos de Java tipo "wildcard", en este caso se tiene declaración de varianza en sitio.
 
-Posee _type erasure_
+El manejo de la covarianza se realiza usando el modificador `out`, donde se asegura que el valor del tipo `T` será de solo lectura. Por ejemplo, la interfaz `List` en Kotlin es así.
+
+Para manejar la contravarianza, se usa el modificador `in` al valor `T`en la declaración de la clase., lo cual asegura que será manejado en la clase. Así mismo se necesita que sea privado el manejador que cambie los valores de este elemento.
