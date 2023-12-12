@@ -51,8 +51,25 @@ Una referencia remota es un objeto que puede usare desde cualquier proceso para 
 
 Una llamada remota, es una solicitud hecha por un proceso para llamar a otra función con ciertos argumentos en otro proceso, inclusive el mismo proceso.
 
+Por ejemplo:
 
+```Julia
+addprocs(Sys.CPU_CORES - 1)
+r1 = remotecall(rand,2,2,2)
+r2 = remotecall(rand,2,1:8,3,4)
+```
 
+La sintaxis de `remotecall()` es: Función, ID del worker y los argumentos de la función. 
+
+En este caso, la primera línea se llamó a la función `rand` la cual genera una matriz 2x2.
+
+Para la segunda línea se usó igualmente `rand` asignando el trabajo al worker 2 para generar una matriz 3x4 con números entre 1 y 8.
+
+Estas funciones generan un tipo de referencia remota llamado `Future`, el cual permite luego hacer consultas del resultado con `fetch()`. Sin embargo, esto sólo permite consultar mas no permite guardar o ver tipos. Es necesario asignarlo a otra veriable:
+
+```Julia
+fetch
+```
 
 
 ##### 1.iii Describa el mecanismo de sincronización que utiliza el lenguaje
