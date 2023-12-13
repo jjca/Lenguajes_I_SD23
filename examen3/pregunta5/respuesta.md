@@ -1,73 +1,65 @@
-```Haskell
-foldr :: (a -> b -> b) -> b -> [a] -> b
-foldr _ e [] = e
-foldr f e (x:xs) = f x $ foldr f e xs
+# Pregunta 5
 
+Muestre la evaluación, paso a paso, de la expresión `misteriosa "abc" (gen 1)`, considerando que:
 
-const :: a -> b -> a
-const x _ = x
-```
-
-Considere también la siguiente función que aplica una función solamente sobre la cola de una lista y agrupa la cabeza con otro valor dado:
-```Haskell
-what :: a -> ([b] -> [(a, b)]) -> [b] -> [(a, b)]
-what _ _ [] = []
-what x f (y:ys) = (x, y) : f ys
-```
-
-(a) Considere la siguiente implementación de una función misteriosa, usando foldr:
-```Haskell
-misteriosa :: ???
-misteriosa = foldr what (const [])
-```
-Considere también la siguiente función, que genera una lista de números enteros a partir de un cierto valor inicial:
-```
-gen :: Int -> [Int]
-gen n = n : gen (n + 1)
-```
-Muestre la evaluación, paso a paso, de la expresión misteriosa "abc" (gen 1), considerando que:
-i. El lenguaje tiene orden de evaluación normal.
-
-Caso cuando el lengauje tiene evaluación normal:
+1. El lenguaje tiene orden de evaluación normal. (Siendo lazy y de afuera hacia adentro)
 
 ```
 misteriosa "abc" (gen 1)
+
+<Evaluacion de misteriosa>
+
+foldr what (const []) "abc" (gen 1)
+
+<Aplicacion de foldr>
+
+what "a" $ foldr what (const []) "bc" (1:gen 2)
+
+<Definicion de what y gen>
+
+("a",1) : foldr what (const []) "bc" (gen 2)
+
+<Aplicacion de foldr>
+
+("a",1) : what "b" $ foldr what (const []) "c" (gen 2)
+
+<Definicion what y gen>
+
+("a",1) : ("b",2) : foldr what (const []) "c" (gen 3)
+
+<Aplicacion de foldr>
+
+("a",1) : ("b",2) : what "c" $ foldr what (const []) [] (gen 3)
+
+<Definicion de what y gen>
+
+("a",1) : ("b",2) : ("c",3) : foldr what (const []) [] (gen 4)
+
+<Aplicación de what>
+
+("a",1) : ("b",2) : ("c",3) : const [] (gen 4)
+
+<Definición de const>
+
+("a",1) : ("b",2) : ("c",3) : []
+
+<Concatenación de lista>
+
+[("a",1),("b",2),("c",3)]
 ```
 
+ii. El lenguaje tiene orden de evaluación aplicativo. (Evaluando antes de pasar y de adentro hacia afuera)
 
-ii. El lenguaje tiene orden de evaluación aplicativo.
-(b) Considere el siguiente tipo de datos que representa árboles binarios con información
-en las ramas:
-data Arbol a = Hoja | Rama a (Arbol a) (Arbol a)
-Construya una función foldA (junto con su firma) que permita reducir un valor de
-tipo (Arbol a) a algún tipo b (de forma análoga a foldr). Su implementación debe
-poder tratar con estructuras potencialmente infinitas.
-Su función debe cumplir con la siguiente firma:
-foldA :: (a -> b -> b -> b) -> b -> Arbol a -> b
-6(c) Considere una versión de la función what que funciona sobre árboles (aplica la función
-proporcionada a ambos sub–árboles) y llamésmola what tree function:
-whatTF :: a
--> (Arbol b -> Arbol (a, b))
--> (Arbol b -> Arbol (a, b))
--> Arbol b
--> Arbol (a, b)
-whatTF _ _ _ Hoja
-= Hoja
-whatTF x f g (Rama y i d) = Rama (x, y) (f i) (g d)
-Usando su función foldA definimos la función sospechosa:
-sospechosa :: ???
-sospechosa = foldA whatTF (const Hoja)
-Definimos también la siguiente función, que genera un árbol de números enteros a
-partir de un cierto valor inicial:
-genA :: Int -> Arbol Int
-genA n = Rama n (genA (n + 1)) (genA (n * 2))
-Finalmente, definimos el valor arbolito como una instancia de Arbol Char:
-arbolito :: Arbol Char
-arbolito = Rama 'a' (Rama 'b' Hoja (Rama 'c' Hoja Hoja)) Hoja
-Muestre la evaluación, paso a paso, de la expresión sospechosa arbolito (genA 1),
-considerando que:
-i. El lenguaje tiene orden de evaluación normal.
-ii. El lenguaje tiene orden de evaluación aplicativo.
-Si sospecha que en algún momento uno de estos programas puede caer en una evaluación
-recursiva infinita, realice las primeras expansiones, detenga la evaluación y argumente las
-razones por las que cree que dicha evaluación no terminaría.
+```Haskell
+misteriosa "abc" (gen 1)
+
+<Evaluación de gen>
+
+misteriosa "abc" (1:gen 2)
+
+<Evaluación de gen>
+
+misteriosa "abc" (1:2:gen 3)
+```
+
+Va a terminar en un loop infinito debido a que la función `gen` seguirá generando números, debido a que al ser evaluación aplicativa, primero habría que terminar de evaluar todas las funciones internas antes de ir a evaluar a `misteriosa`, sin embargo esto no terminará nunca.
