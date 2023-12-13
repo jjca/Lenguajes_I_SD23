@@ -16,6 +16,10 @@ Julia posee de forma nativa los siguientes mecanismos para la concurrencia:
 
 El lenguaje posee capacidades nativas para concurrencia, e igualente posee librerías extras para añadir mejores funcionalidades, como por ejemplo las incluidas en https://github.com/JuliaParallel. Aquí hay para manejo de MPI, arreglos distribuidos, clusterización, arreglos distribuidos, etc.
 
+Es necesario ejecutar a Julia con el argumento -p (número de trabajadores) o -t (hilos). `julia -p 2` crea una consola interactiva de Julia con las librerías para poder ejecutar tareas en paralelo.
+
+La cantidad de trabajadores corresponde con el número de subprocesos  a ser creados. Se tendrán realmente n+1, debido al proceso padre.
+
 ##### 1.ii Explique la creación/manejo de tareas concurrentes, así como el control de la memoria compartida y/o pasaje de mensajes
 
 Para realizar tareas en paralelo se puede usar el módulo `@Threads`
@@ -65,12 +69,30 @@ En este caso, la primera línea se llamó a la función `rand` la cual genera un
 
 Para la segunda línea se usó igualmente `rand` asignando el trabajo al worker 2 para generar una matriz 3x4 con números entre 1 y 8.
 
-Estas funciones generan un tipo de referencia remota llamado `Future`, el cual permite luego hacer consultas del resultado con `fetch()`. Sin embargo, esto sólo permite consultar mas no permite guardar o ver tipos. Es necesario asignarlo a otra veriable:
+Estas funciones generan un tipo de referencia remota llamado `Future`, el cual permite luego hacer consultas del resultado con `fetch()`. Sin embargo, esto sólo permite consultar mas no permite guardar o ver tipos. Es necesario asignarlo a otra variable:
 
 ```Julia
-fetch
+fetch(r1)
+fetch(r2)
+
+r1
+r1[2,2]
+typeof(r1)
+
+r3 = fetch(r1)
+typeof(r3)
+sum(r3)
 ```
+
+También es posible hacer uso de `@spawnat` el cual también retorna un `Future`.
+
+
+Para el manejo de mensajes y de memoria compartida, se tiene:
+
+- Aún cuando Julia no lo posee de forma nativa, existe un paquete llamado MPI.jl el cual permite implementar el estandar de MPI en Julia.
+- Para la computación con memoria compartida están las `remote calls` y las `remote references`. También se tiene un arreglo distribuido, la implementación de la función `map` pero para hilos y el macro `@distributed`
 
 
 ##### 1.iii Describa el mecanismo de sincronización que utiliza el lenguaje
 
+Para la sincronización se usa `@sync`.
