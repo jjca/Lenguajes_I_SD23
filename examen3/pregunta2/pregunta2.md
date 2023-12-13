@@ -86,15 +86,21 @@ sum(r3)
 
 También es posible hacer uso de `@spawnat` el cual también retorna un `Future`.
 
+Otra forma es usando la libreraía `Distributed`, la cual permite ejecutar tareas en varios procesadores, las variables usadas serán copiadas y enviadas a cada procesador. 
+
 
 Para el manejo de mensajes y de memoria compartida, se tiene:
 
 - Aún cuando Julia no lo posee de forma nativa, existe un paquete llamado MPI.jl el cual permite implementar el estandar de MPI en Julia.
-- Para la computación con memoria compartida están las `remote calls` y las `remote references`. También se tiene un arreglo distribuido, la implementación de la función `map` pero para hilos y el macro `@distributed`
+- Para la computación con memoria compartida están las `remote calls` y las `remote references`. También se tiene un arreglo distribuido, la implementación de la función `map` pero para hilos y el macro `@distributed` 
+- Los mensajes en Julia son desde un solo lado, el programador necesita manejra sólo un proceso en una operación de dos procesos.
 
 
 ##### 1.iii Describa el mecanismo de sincronización que utiliza el lenguaje
 
-Para la sincronización y evitar condiciones de carrera, se usan `@sync`, los canales. 
+Para la sincronización y evitar condiciones de carrera, se usan `@sync`, los canales y los Tasks.
 
-El programador es responsable de que no ocurran condiciones de carrera. 
+- Los `Tasks` son meramente corrutinas.
+- Con los `fetch` y `wait` se puede obtener una tarea o el resultado de una.
+- `@sync` permite usarse para que se espere por todas las tareas, de forma que ya haya sincronización. Aquí no hay bloqueo, dado qeu los hilos son programados cooperativamente y sin preempción.
+- Un canal se puede ver como una cola FIFO, tiene un extremo para escribir y otro para leer. Múltiples lectores pueden leer al mismo tiempo en una tubería usando `read!`, masí como múltiples escritores pueden escribir en diferents tareas en el mismio canal con `put!`.
