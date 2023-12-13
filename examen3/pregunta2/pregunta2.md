@@ -95,4 +95,6 @@ Para el manejo de mensajes y de memoria compartida, se tiene:
 
 ##### 1.iii Describa el mecanismo de sincronización que utiliza el lenguaje
 
-Para la sincronización se usa `@sync`.
+Para la sincronización y evitar condiciones de carrera, se usan `@sync`, los canales. 
+
+El programador es responsable de que no ocurran condiciones de carrera. 
